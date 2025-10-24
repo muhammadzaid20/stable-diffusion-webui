@@ -7,6 +7,17 @@ import modules.images
 from modules.ui_components import ToolButton
 
 
+def _click_js_compat(btn, *, fn, js_code, **kwargs):
+    """
+    Gradio 3.x: _js=..., Gradio 4.x+: js=...
+    keep legacy callbacks working across releases.
+    """
+    try:
+        return btn.click(fn=fn, _js=js_code, **kwargs)
+    except TypeError:
+        return btn.click(fn=fn, js=js_code, **kwargs)
+
+
 class Toprow:
     """Creates a top row UI with prompts, generate button, styles, extra little buttons for things, and enables some functionality related to their operation"""
 
@@ -123,7 +134,11 @@ class Toprow:
                     shared.state.interrupt()
 
             self.skip.click(fn=shared.state.skip)
-            self.interrupt.click(fn=interrupt_function, _js='function(){ showSubmitInterruptingPlaceholder("' + self.id_part + '"); }')
+            _click_js_compat(
+                self.interrupt,
+                fn=interrupt_function,
+                js_code=f'function(){{ showSubmitInterruptingPlaceholder("{self.id_part}"); }}',
+            )
             self.interrupting.click(fn=interrupt_function)
 
     def create_tools_row(self):
@@ -145,9 +160,10 @@ class Toprow:
             self.negative_token_counter = gr.HTML(value="<span>0/75</span>", elem_id=f"{self.id_part}_negative_token_counter", elem_classes=["token-counter"], visible=False)
             self.negative_token_button = gr.Button(visible=False, elem_id=f"{self.id_part}_negative_token_button")
 
-            self.clear_prompt_button.click(
+            _click_js_compat(
+                self.clear_prompt_button,
                 fn=lambda *x: x,
-                _js="confirm_clear_prompt",
+                js_code="confirm_clear_prompt",
                 inputs=[self.prompt, self.negative_prompt],
                 outputs=[self.prompt, self.negative_prompt],
             )
