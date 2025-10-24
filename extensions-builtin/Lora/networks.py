@@ -638,7 +638,20 @@ def network_LayerNorm_load_state_dict(self, *args, **kwargs):
 def network_MultiheadAttention_forward(self, *args, **kwargs):
     network_apply_weights(self)
 
-    return originals.MultiheadAttention_forward(self, *args, **kwargs)
+    attn_mask = kwargs.get("attn_mask")
+    args_list = list(args)
+
+    if attn_mask is None and len(args_list) >= 6:
+        attn_mask = args_list[5]
+
+    if isinstance(attn_mask, torch.Tensor) and attn_mask.dim() == 2:
+        attn_mask = attn_mask.unsqueeze(0)
+        if "attn_mask" in kwargs:
+            kwargs["attn_mask"] = attn_mask
+        elif len(args_list) >= 6:
+            args_list[5] = attn_mask
+
+    return originals.MultiheadAttention_forward(self, *args_list, **kwargs)
 
 
 def network_MultiheadAttention_load_state_dict(self, *args, **kwargs):
