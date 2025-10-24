@@ -104,7 +104,7 @@ try:
         __name__,
         obj=EventListener,
         field="_setup",
-        replacement=staticmethod(_wrap_event_listener_setup(_original_event_listener_setup)),
+        replacement=_wrap_event_listener_setup(_original_event_listener_setup),
     )
 except Exception:
     # If Gradio significantly reshapes its event dispatch internals we fall back to

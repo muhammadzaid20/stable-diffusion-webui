@@ -651,13 +651,10 @@ def network_MultiheadAttention_forward(self, *args, **kwargs):
             attn_mask = torch.where(attn_mask, float("-inf"), 0.0)
         attn_mask = attn_mask.to(mask_dtype)
 
-        if attn_mask.dim() == 2:
-            attn_mask = attn_mask.unsqueeze(0)
+        target_len = None
+        batch_size = None
 
-        if attn_mask.dim() == 4:
-            attn_mask = attn_mask.view(-1, attn_mask.size(-2), attn_mask.size(-1))
-
-        if attn_mask.dim() == 3 and isinstance(query, torch.Tensor):
+        if isinstance(query, torch.Tensor):
             if self.batch_first:
                 batch_size = query.size(0)
                 target_len = query.size(1)
@@ -665,9 +662,44 @@ def network_MultiheadAttention_forward(self, *args, **kwargs):
                 target_len = query.size(0)
                 batch_size = query.size(1)
 
+        if attn_mask.dim() == 2:
+            if target_len is not None and attn_mask.size(0) != target_len:
+                if attn_mask.size(0) > target_len:
+                    attn_mask = attn_mask[-target_len:]
+                else:
+                    repeat = (target_len + attn_mask.size(0) - 1) // max(attn_mask.size(0), 1)
+                    attn_mask = attn_mask.repeat(repeat, 1)[-target_len:]
+            attn_mask = attn_mask.unsqueeze(0)
+
+        if attn_mask.dim() == 3 and target_len is not None:
+            if attn_mask.size(-2) != target_len:
+                if attn_mask.size(-2) > target_len:
+                    attn_mask = attn_mask[..., -target_len:, :]
+                else:
+                    repeat = (target_len + attn_mask.size(-2) - 1) // max(attn_mask.size(-2), 1)
+                    attn_mask = attn_mask.repeat_interleave(repeat, dim=-2)[..., -target_len:, :]
+
+        if attn_mask.dim() == 4:
+            if target_len is not None and attn_mask.size(-2) != target_len:
+                if attn_mask.size(-2) > target_len:
+                    attn_mask = attn_mask[..., -target_len:, :]
+                else:
+                    repeat = (target_len + attn_mask.size(-2) - 1) // max(attn_mask.size(-2), 1)
+                    attn_mask = attn_mask.repeat_interleave(repeat, dim=-2)[..., -target_len:, :]
+            attn_mask = attn_mask.view(-1, attn_mask.size(-2), attn_mask.size(-1))
+
+        if attn_mask.dim() == 3 and target_len is not None and batch_size is not None:
             expected_heads = max(self.num_heads, 1)
             expected_batches = max(batch_size, 1)
-            attn_mask = attn_mask.expand(expected_batches * expected_heads, target_len, attn_mask.size(-1))
+            expected_first_dim = expected_batches * expected_heads
+
+            if attn_mask.size(0) == batch_size and expected_heads > 1:
+                attn_mask = attn_mask.repeat_interleave(expected_heads, dim=0)
+            elif attn_mask.size(0) == 1 and expected_first_dim != 1:
+                attn_mask = attn_mask.expand(expected_first_dim, -1, -1)
+            elif attn_mask.size(0) not in (expected_first_dim,):
+                repeat = (expected_first_dim + attn_mask.size(0) - 1) // max(attn_mask.size(0), 1)
+                attn_mask = attn_mask.repeat(repeat, 1, 1)[:expected_first_dim]
 
         if "attn_mask" in kwargs:
             kwargs["attn_mask"] = attn_mask
