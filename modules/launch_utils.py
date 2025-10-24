@@ -37,21 +37,18 @@ def check_python_version():
     minor = sys.version_info.minor
     micro = sys.version_info.micro
 
-    if is_windows:
-        supported_minors = [10, 11, 12]
-    else:
-        supported_minors = [8, 9, 10, 11, 12]
+    required_major, required_minor, required_micro = 3, 10, 11
 
-    if not (major == 3 and minor in supported_minors):
+    if not (major == required_major and minor == required_minor and micro >= required_micro):
         import modules.errors
 
         modules.errors.print_error_explanation(f"""
 INCOMPATIBLE PYTHON VERSION
 
-This program is tested with Python 3.11 (3.11.9 or newer), but you have {major}.{minor}.{micro}.
+This program is tested with Python 3.10 (3.10.11 or newer 3.10.x patch releases), but you have {major}.{minor}.{micro}.
 If you encounter an error with "RuntimeError: Couldn't install torch." message,
 or any other error regarding unsuccessful package (library) installation,
-please install a supported Python 3.11 or 3.12 build
+please install Python 3.10.11
 and delete current Python and "venv" folder in WebUI's directory.
 
 You can download modern Python installers from here: https://www.python.org/downloads/

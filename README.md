@@ -4,7 +4,7 @@ A web interface for Stable Diffusion, implemented using Gradio library.
 ![](screenshot.png)
 
 ## What's new in 2025
-- Updated dependency baseline for Python 3.12, PyTorch 2.9.0, CUDA 12.8, FastAPI 0.120, Gradio 5.49+, and Transformers 4.57.
+- Updated dependency baseline for Python 3.10.11, PyTorch 2.9.0, CUDA 12.8, FastAPI 0.120, Gradio 5.49+, and Transformers 4.57.
 - Refreshed installation instructions for current Windows, Linux, and WSL distributions.
 - Stable Diffusion 3, SDXL, and Flux workflows continue to work with the latest community checkpoints and extensions.
 
@@ -127,7 +127,7 @@ Alternatively, use online services (like Google Colab):
 > For more details see [Install-and-Run-on-NVidia-GPUs](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs)
 
 ### Automatic Installation on Windows
-1. Install [Python 3.12](https://www.python.org/downloads/windows/) (3.12.3 or newer is recommended; Python 3.11.9+ remains supported), checking "Add Python to PATH".
+1. Install [Python 3.10.11](https://www.python.org/downloads/release/python-31011/) (3.10.11 or a newer 3.10 patch release is recommended), checking "Add Python to PATH".
 2. Install [git](https://git-scm.com/download/win).
 3. Download the stable-diffusion-webui repository, for example by running `git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git`.
 4. Run `webui-user.bat` from Windows Explorer as normal, non-administrator, user.
@@ -144,23 +144,23 @@ sudo zypper install wget git python3 libtcmalloc4 libglvnd
 # Arch-based:
 sudo pacman -S wget git python3
 ```
-If your system is very new, install Python 3.12 explicitly before running the launcher:
+If your system is very new, install Python 3.10 explicitly before running the launcher:
 ```bash
 # Ubuntu 24.04
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install python3.12 python3.12-venv
+sudo apt install python3.10 python3.10-venv
 
 # Fedora 40+
-sudo dnf install python3.12
+sudo dnf install python3.10
 
 # Manjaro/Arch (ships Python 3.12 by default)
-sudo pacman -S python
+sudo pacman -S python310
 
 # To force a specific interpreter in the launch scripts
-export python_cmd="python3.12"
+export python_cmd="python3.10"
 # or in webui-user.sh
-python_cmd="python3.12"  # set to python3.11 if you need the older toolchain
+python_cmd="python3.10"  # set to python3 if your distribution already defaults to 3.10
 ```
 2. Navigate to the directory you would like the webui to be installed and execute the following command:
 ```bash
