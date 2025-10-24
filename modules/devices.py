@@ -106,8 +106,37 @@ def enable_tf32():
         if cuda_no_autocast():
             torch.backends.cudnn.benchmark = True
 
-        torch.backends.cuda.matmul.allow_tf32 = True
-        torch.backends.cudnn.allow_tf32 = True
+        matmul_backend = getattr(torch.backends.cuda, "matmul", None)
+        if matmul_backend is not None:
+            precision_patched = False
+            try:
+                matmul_backend.fp32_precision = "tf32"
+                precision_patched = True
+            except AttributeError:
+                pass
+
+            if not precision_patched:
+                try:
+                    matmul_backend.allow_tf32 = True
+                except AttributeError:
+                    pass
+
+        cudnn_backend = getattr(torch.backends, "cudnn", None)
+        if cudnn_backend is not None:
+            conv_backend = getattr(cudnn_backend, "conv", None)
+            precision_patched = False
+            if conv_backend is not None:
+                try:
+                    conv_backend.fp32_precision = "tf32"
+                    precision_patched = True
+                except AttributeError:
+                    pass
+
+            if not precision_patched:
+                try:
+                    cudnn_backend.allow_tf32 = True
+                except AttributeError:
+                    pass
 
 
 errors.run(enable_tf32, "Enabling TF32")

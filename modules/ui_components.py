@@ -1,5 +1,7 @@
 import gradio as gr
 
+from modules.gradio_compat import with_webui_tooltip
+
 
 class FormComponent:
     def get_expected_parent(self):
@@ -13,8 +15,10 @@ class ToolButton(FormComponent, gr.Button):
     """Small button with single emoji as text, fits inside gradio forms"""
 
     def __init__(self, *args, **kwargs):
+        tooltip = kwargs.pop("tooltip", None)
         classes = kwargs.pop("elem_classes", [])
         super().__init__(*args, elem_classes=["tool", *classes], **kwargs)
+        with_webui_tooltip(self, tooltip)
 
     def get_block_name(self):
         return "button"
