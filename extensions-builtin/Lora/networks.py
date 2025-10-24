@@ -638,7 +638,97 @@ def network_LayerNorm_load_state_dict(self, *args, **kwargs):
 def network_MultiheadAttention_forward(self, *args, **kwargs):
     network_apply_weights(self)
 
-    return originals.MultiheadAttention_forward(self, *args, **kwargs)
+    attn_mask = kwargs.get("attn_mask")
+    args_list = list(args)
+    query = args_list[0] if args_list else None
+
+    if attn_mask is None and len(args_list) >= 6:
+        attn_mask = args_list[5]
+
+    if isinstance(attn_mask, torch.Tensor):
+        mask_dtype = query.dtype if isinstance(query, torch.Tensor) else torch.float32
+        if attn_mask.dtype == torch.bool:
+            attn_mask = torch.where(attn_mask, float("-inf"), 0.0)
+        attn_mask = attn_mask.to(mask_dtype)
+
+        target_len = None
+        batch_size = None
+
+        if isinstance(query, torch.Tensor):
+            if self.batch_first:
+                batch_size = query.size(0)
+                target_len = query.size(1)
+            else:
+                target_len = query.size(0)
+                batch_size = query.size(1)
+
+        if attn_mask.dim() == 2:
+            if target_len is not None and attn_mask.size(0) != target_len:
+                if attn_mask.size(0) > target_len:
+                    attn_mask = attn_mask[-target_len:]
+                else:
+                    repeat = (target_len + attn_mask.size(0) - 1) // max(attn_mask.size(0), 1)
+                    attn_mask = attn_mask.repeat(repeat, 1)[-target_len:]
+            attn_mask = attn_mask.unsqueeze(0)
+
+        if attn_mask.dim() == 3 and target_len is not None:
+            if attn_mask.size(-2) != target_len:
+                if attn_mask.size(-2) > target_len:
+                    attn_mask = attn_mask[..., -target_len:, :]
+                else:
+                    repeat = (target_len + attn_mask.size(-2) - 1) // max(attn_mask.size(-2), 1)
+                    attn_mask = attn_mask.repeat_interleave(repeat, dim=-2)[..., -target_len:, :]
+
+        if attn_mask.dim() == 4:
+            if target_len is not None and attn_mask.size(-2) != target_len:
+                if attn_mask.size(-2) > target_len:
+                    attn_mask = attn_mask[..., -target_len:, :]
+                else:
+                    repeat = (target_len + attn_mask.size(-2) - 1) // max(attn_mask.size(-2), 1)
+                    attn_mask = attn_mask.repeat_interleave(repeat, dim=-2)[..., -target_len:, :]
+            attn_mask = attn_mask.view(-1, attn_mask.size(-2), attn_mask.size(-1))
+
+        if target_len is not None and batch_size is not None:
+            expected_heads = max(self.num_heads, 1)
+            expected_batches = max(batch_size, 1)
+            expected_first_dim = expected_batches * expected_heads
+
+            if attn_mask.dim() == 2:
+                attn_mask = attn_mask.unsqueeze(0)
+
+            if attn_mask.dim() == 3:
+                try:
+                    if attn_mask.size(1) != target_len:
+                        attn_mask = attn_mask[:, :target_len, :]
+
+                    attn_mask = attn_mask.expand(
+                        expected_first_dim,
+                        target_len,
+                        attn_mask.size(-1),
+                    )
+                except RuntimeError:
+                    attn_mask = None
+
+            elif attn_mask.dim() == 4:
+                attn_mask = attn_mask.view(-1, attn_mask.size(-2), attn_mask.size(-1))
+                try:
+                    if attn_mask.size(1) != target_len:
+                        attn_mask = attn_mask[:, :target_len, :]
+
+                    attn_mask = attn_mask.expand(
+                        expected_first_dim,
+                        target_len,
+                        attn_mask.size(-1),
+                    )
+                except RuntimeError:
+                    attn_mask = None
+
+        if "attn_mask" in kwargs:
+            kwargs["attn_mask"] = attn_mask
+        elif len(args_list) >= 6:
+            args_list[5] = attn_mask
+
+    return originals.MultiheadAttention_forward(self, *args_list, **kwargs)
 
 
 def network_MultiheadAttention_load_state_dict(self, *args, **kwargs):
