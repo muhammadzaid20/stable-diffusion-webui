@@ -60,4 +60,17 @@ def resolve_deprecation_warning():
     return None
 
 
-__all__ = ["resolve_io_component_base", "resolve_deprecation_warning"]
+def with_webui_tooltip(component, tooltip):
+    """Attach Stable Diffusion WebUI tooltip metadata to a Gradio component."""
+
+    if tooltip is not None:
+        setattr(component, "webui_tooltip", tooltip)
+
+    return component
+
+
+__all__ = [
+    "resolve_io_component_base",
+    "resolve_deprecation_warning",
+    "with_webui_tooltip",
+]

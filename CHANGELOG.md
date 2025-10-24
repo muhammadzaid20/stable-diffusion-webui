@@ -12,9 +12,11 @@
 * Upgraded to Gradio 5.49.1 so Pillow 11 stays compatible with the WebUI frontend stack.
 * Added a compatibility shim and explicit dependency on `packaging` so legacy CLIP imports keep working with modern Setuptools releases.
 * Bumped the WSL environment YAML to Python 3.12 and CUDA 12.8.
-* Raised the Torch baseline to 2.9.0 so upcoming RTX 50-series GPUs are supported out of the box.
+* Locked Torch and Torchvision to the official 2.9.0+cu128 / 0.24.0+cu128 wheels so RTX 50-series GPUs initialize without manual pinning.
 * Hardened the Gradio deprecation resolver so startup succeeds even when namespace modules do not expose `__path__` metadata.
 * Detect GPUs that are newer than the bundled CUDA kernels and fall back to CPU mode with guidance on installing a supporting Torch build.
+* Reworked Gradio tooltip handling so the WebUI metadata survives the 5.x constructor API changes without breaking older extensions.
+* Updated TF32 enablement to the new PyTorch 2.9 backend knobs and normalized Multi-Head Attention masks to satisfy the stricter kernels.
 
 
 ## 1.10.1

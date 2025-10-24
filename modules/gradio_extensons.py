@@ -19,7 +19,9 @@ def add_classes_to_gradio_component(comp):
 
 
 def IOComponent_init(self, *args, **kwargs):
-    self.webui_tooltip = kwargs.pop("tooltip", None)
+    tooltip = kwargs.pop("tooltip", None)
+    if tooltip is not None:
+        self.webui_tooltip = tooltip
 
     if scripts.scripts_current is not None:
         scripts.scripts_current.before_component(self, **kwargs)
