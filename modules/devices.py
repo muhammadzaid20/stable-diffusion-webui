@@ -108,18 +108,35 @@ def enable_tf32():
 
         matmul_backend = getattr(torch.backends.cuda, "matmul", None)
         if matmul_backend is not None:
-            if hasattr(matmul_backend, "fp32_precision"):
+            precision_patched = False
+            try:
                 matmul_backend.fp32_precision = "tf32"
-            elif hasattr(matmul_backend, "allow_tf32"):
-                matmul_backend.allow_tf32 = True
+                precision_patched = True
+            except AttributeError:
+                pass
+
+            if not precision_patched:
+                try:
+                    matmul_backend.allow_tf32 = True
+                except AttributeError:
+                    pass
 
         cudnn_backend = getattr(torch.backends, "cudnn", None)
         if cudnn_backend is not None:
             conv_backend = getattr(cudnn_backend, "conv", None)
-            if conv_backend is not None and hasattr(conv_backend, "fp32_precision"):
-                conv_backend.fp32_precision = "tf32"
-            elif hasattr(cudnn_backend, "allow_tf32"):
-                cudnn_backend.allow_tf32 = True
+            precision_patched = False
+            if conv_backend is not None:
+                try:
+                    conv_backend.fp32_precision = "tf32"
+                    precision_patched = True
+                except AttributeError:
+                    pass
+
+            if not precision_patched:
+                try:
+                    cudnn_backend.allow_tf32 = True
+                except AttributeError:
+                    pass
 
 
 errors.run(enable_tf32, "Enabling TF32")

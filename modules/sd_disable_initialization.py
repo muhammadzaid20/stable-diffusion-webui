@@ -70,9 +70,15 @@ class DisableInitialization(ReplaceHelper):
                 model_id = kwargs.get("config")
 
             kwargs.setdefault("config", model_id)
-            kwargs.setdefault("state_dict", {})
 
-            res = self.CLIPTextModel_from_pretrained(model_id, *model_args, **kwargs)
+            state_dict = kwargs.get("state_dict")
+            if state_dict is None:
+                state_dict = {}
+                kwargs["state_dict"] = state_dict
+
+            load_target = model_id if state_dict else None
+
+            res = self.CLIPTextModel_from_pretrained(load_target, *model_args, **kwargs)
             res.name_or_path = pretrained_model_name_or_path
             return res
 

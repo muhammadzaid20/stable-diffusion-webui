@@ -645,7 +645,7 @@ def network_MultiheadAttention_forward(self, *args, **kwargs):
         attn_mask = args_list[5]
 
     if isinstance(attn_mask, torch.Tensor) and attn_mask.dim() == 2:
-        attn_mask = attn_mask.unsqueeze(0).unsqueeze(0)
+        attn_mask = attn_mask.unsqueeze(0)
         if "attn_mask" in kwargs:
             kwargs["attn_mask"] = attn_mask
         elif len(args_list) >= 6:
