@@ -13,6 +13,7 @@
 * Added a compatibility shim and explicit dependency on `packaging` so legacy CLIP imports keep working with modern Setuptools releases.
 * Bumped the WSL environment YAML to Python 3.10.11 and CUDA 12.8.
 * Locked Torch and Torchvision to the official 2.9.0+cu128 / 0.24.0+cu128 wheels so RTX 50-series GPUs initialize without manual pinning.
+* Backed the numpy ceiling down to `<2.3` (pinning 2.2.6 in the frozen set) so the refreshed dependency stack installs cleanly on Python 3.10.
 * Revalidated the refreshed dependency pins against Python 3.10.11 to ensure full compatibility on the restored runtime baseline.
 * Hardened the Gradio deprecation resolver so startup succeeds even when namespace modules do not expose `__path__` metadata.
 * Detect GPUs that are newer than the bundled CUDA kernels and fall back to CPU mode with guidance on installing a supporting Torch build.
