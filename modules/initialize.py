@@ -7,6 +7,7 @@ from threading import Thread
 
 from modules.timer import startup_timer
 from modules.lightning_compat import get_lightning_module, ensure_rank_zero_aliases
+from modules.cuda_compat import ensure_future_gpu_compatibility
 
 
 def imports():
@@ -15,6 +16,7 @@ def imports():
 
     import torch  # noqa: F401
     startup_timer.record("import torch")
+    ensure_future_gpu_compatibility()
     get_lightning_module()
     ensure_rank_zero_aliases()
     from modules.pkg_resources_compat import ensure_packaging_attribute

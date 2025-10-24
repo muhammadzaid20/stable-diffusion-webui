@@ -105,6 +105,15 @@ Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-di
 - [Intel CPUs, Intel GPUs (both integrated and discrete)](https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon) (external wiki page)
 - [Ascend NPUs](https://github.com/wangshuai09/stable-diffusion-webui/wiki/Install-and-run-on-Ascend-NPUs) (external wiki page)
 
+### Future NVIDIA GPUs and new CUDA architectures
+
+New NVIDIA cards occasionally launch before prebuilt PyTorch wheels expose kernels
+for their compute capability. When we detect that situation the launcher now
+automatically switches to CPU execution and prints guidance on installing a torch
+build that supports the reported architecture. Follow the link in the warning to
+install an appropriate preview or future wheel, then remove the fallback by
+launching with the updated torch package installed.
+
 Alternatively, use online services (like Google Colab):
 
 - [List of Online Services](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)

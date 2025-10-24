@@ -12,6 +12,7 @@
 * Upgraded to Gradio 5.49.1 so Pillow 11 stays compatible with the WebUI frontend stack.
 * Added a compatibility shim and explicit dependency on `packaging` so legacy CLIP imports keep working with modern Setuptools releases.
 * Bumped the WSL environment YAML to Python 3.12 and CUDA 12.1.
+* Detect GPUs that are newer than the bundled CUDA kernels and fall back to CPU mode with guidance on installing a supporting Torch build.
 
 
 ## 1.10.1
