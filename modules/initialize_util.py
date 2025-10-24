@@ -5,6 +5,7 @@ import sys
 import re
 
 from modules.timer import startup_timer
+from modules.lightning_compat import ensure_rank_zero_aliases
 
 
 def gradio_server_name():
@@ -25,12 +26,10 @@ def fix_torch_version():
         torch.__version__ = re.search(r'[\d.]+[\d]', torch.__version__).group(0)
 
 def fix_pytorch_lightning():
-    # Checks if pytorch_lightning.utilities.distributed already exists in the sys.modules cache
-    if 'pytorch_lightning.utilities.distributed' not in sys.modules:
-        import pytorch_lightning
-        # Lets the user know that the library was not found and then will set it to pytorch_lightning.utilities.rank_zero
-        print("Pytorch_lightning.distributed not found, attempting pytorch_lightning.rank_zero")
-        sys.modules["pytorch_lightning.utilities.distributed"] = pytorch_lightning.utilities.rank_zero
+    try:
+        ensure_rank_zero_aliases()
+    except ModuleNotFoundError:
+        return
 
 def fix_asyncio_event_loop_policy():
     """
