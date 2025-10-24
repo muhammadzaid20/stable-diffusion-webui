@@ -12,6 +12,7 @@ import re
 
 # PyTorch 1.13 and later have _TypedStorage renamed to TypedStorage
 from modules import errors
+from modules.lightning_compat import import_lightning_submodule
 
 TypedStorage = torch.storage.TypedStorage if hasattr(torch.storage, 'TypedStorage') else torch.storage._TypedStorage
 
@@ -51,12 +52,12 @@ class RestrictedUnpickler(pickle.Unpickler):
             return getattr(numpy, name)
         if module == '_codecs' and name == 'encode':
             return encode
-        if module == "pytorch_lightning.callbacks" and name == 'model_checkpoint':
-            import pytorch_lightning.callbacks
-            return pytorch_lightning.callbacks.model_checkpoint
-        if module == "pytorch_lightning.callbacks.model_checkpoint" and name == 'ModelCheckpoint':
-            import pytorch_lightning.callbacks.model_checkpoint
-            return pytorch_lightning.callbacks.model_checkpoint.ModelCheckpoint
+        if module in ("pytorch_lightning.callbacks", "lightning.pytorch.callbacks") and name == 'model_checkpoint':
+            callbacks = import_lightning_submodule(("pytorch_lightning.callbacks", "lightning.pytorch.callbacks"))
+            return callbacks.model_checkpoint
+        if module in ("pytorch_lightning.callbacks.model_checkpoint", "lightning.pytorch.callbacks.model_checkpoint") and name == 'ModelCheckpoint':
+            checkpoint_module = import_lightning_submodule(("pytorch_lightning.callbacks.model_checkpoint", "lightning.pytorch.callbacks.model_checkpoint"))
+            return checkpoint_module.ModelCheckpoint
         if module == "__builtin__" and name == 'set':
             return set
 
