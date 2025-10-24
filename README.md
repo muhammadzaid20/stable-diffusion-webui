@@ -3,6 +3,11 @@ A web interface for Stable Diffusion, implemented using Gradio library.
 
 ![](screenshot.png)
 
+## What's new in 2025
+- Updated dependency baseline for Python 3.12, PyTorch 2.9.0, CUDA 12.8, FastAPI 0.120, Gradio 5.49+, and Transformers 4.57.
+- Refreshed installation instructions for current Windows, Linux, and WSL distributions.
+- Stable Diffusion 3, SDXL, and Flux workflows continue to work with the latest community checkpoints and extensions.
+
 ## Features
 [Detailed feature showcase with images](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features):
 - Original txt2img and img2img modes
@@ -100,18 +105,29 @@ Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-di
 - [Intel CPUs, Intel GPUs (both integrated and discrete)](https://github.com/openvinotoolkit/stable-diffusion-webui/wiki/Installation-on-Intel-Silicon) (external wiki page)
 - [Ascend NPUs](https://github.com/wangshuai09/stable-diffusion-webui/wiki/Install-and-run-on-Ascend-NPUs) (external wiki page)
 
+### Future NVIDIA GPUs and new CUDA architectures
+
+New NVIDIA cards occasionally launch before prebuilt PyTorch wheels expose kernels
+for their compute capability. The default installation now targets PyTorch 2.9.0+
+with CUDA 12.8 wheels so RTX 50-series GPUs work out of the box. If you override
+the torch version and we detect that your GPU is newer than the compiled kernels,
+the launcher will switch to CPU execution and print guidance on installing a
+torch build that supports the reported architecture. Follow the link in the
+warning to install an appropriate preview or future wheel, then relaunch with the
+updated torch package installed.
+
 Alternatively, use online services (like Google Colab):
 
 - [List of Online Services](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)
 
 ### Installation on Windows 10/11 with NVidia-GPUs using release package
-1. Download `sd.webui.zip` from [v1.0.0-pre](https://github.com/AUTOMATIC1111/stable-diffusion-webui/releases/tag/v1.0.0-pre) and extract its contents.
+1. Download `sd.webui.zip` from the [latest release](https://github.com/AUTOMATIC1111/stable-diffusion-webui/releases/latest) and extract its contents.
 2. Run `update.bat`.
 3. Run `run.bat`.
 > For more details see [Install-and-Run-on-NVidia-GPUs](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs)
 
 ### Automatic Installation on Windows
-1. Install [Python 3.10.6](https://www.python.org/downloads/release/python-3106/) (Newer version of Python does not support torch), checking "Add Python to PATH".
+1. Install [Python 3.12](https://www.python.org/downloads/windows/) (3.12.3 or newer is recommended; Python 3.11.9+ remains supported), checking "Add Python to PATH".
 2. Install [git](https://git-scm.com/download/win).
 3. Download the stable-diffusion-webui repository, for example by running `git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git`.
 4. Run `webui-user.bat` from Windows Explorer as normal, non-administrator, user.
@@ -128,22 +144,23 @@ sudo zypper install wget git python3 libtcmalloc4 libglvnd
 # Arch-based:
 sudo pacman -S wget git python3
 ```
-If your system is very new, you need to install python3.11 or python3.10:
+If your system is very new, install Python 3.12 explicitly before running the launcher:
 ```bash
 # Ubuntu 24.04
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install python3.11
+sudo apt install python3.12 python3.12-venv
 
-# Manjaro/Arch
-sudo pacman -S yay
-yay -S python311 # do not confuse with python3.11 package
+# Fedora 40+
+sudo dnf install python3.12
 
-# Only for 3.11
-# Then set up env variable in launch script
-export python_cmd="python3.11"
+# Manjaro/Arch (ships Python 3.12 by default)
+sudo pacman -S python
+
+# To force a specific interpreter in the launch scripts
+export python_cmd="python3.12"
 # or in webui-user.sh
-python_cmd="python3.11"
+python_cmd="python3.12"  # set to python3.11 if you need the older toolchain
 ```
 2. Navigate to the directory you would like the webui to be installed and execute the following command:
 ```bash

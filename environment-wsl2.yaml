@@ -1,11 +1,12 @@
 name: automatic
 channels:
   - pytorch
+  - nvidia
   - defaults
 dependencies:
-  - python=3.10
-  - pip=23.0
-  - cudatoolkit=11.8
-  - pytorch=2.0
-  - torchvision=0.15
-  - numpy=1.23
+  - python=3.12
+  - pip=24.2
+  - cudatoolkit=12.8
+  - pytorch=2.9
+  - torchvision=0.24
+  - numpy=2.3

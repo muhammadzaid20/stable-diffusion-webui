@@ -107,14 +107,15 @@ def check_versions():
     import torch
     import gradio
 
-    expected_torch_version = "2.1.2"
+    expected_torch_version = "2.9.0"
     expected_xformers_version = "0.0.23.post1"
-    expected_gradio_version = "3.41.2"
+    minimum_gradio_version = "5.49.1"
 
-    if version.parse(torch.__version__) < version.parse(expected_torch_version):
+    installed_torch = version.parse(torch.__version__)
+    if installed_torch < version.parse(expected_torch_version):
         print_error_explanation(f"""
 You are running torch {torch.__version__}.
-The program is tested to work with torch {expected_torch_version}.
+The program is tested to work with torch {expected_torch_version}+cu128.
 To reinstall the desired version, run with commandline flag --reinstall-torch.
 Beware that this will cause a lot of large files to be downloaded, as well as
 there are reports of issues with training tab on the latest version.
@@ -134,10 +135,10 @@ To reinstall the desired version, run with commandline flag --reinstall-xformers
 Use --skip-version-check commandline argument to disable this check.
             """.strip())
 
-    if gradio.__version__ != expected_gradio_version:
+    if version.parse(gradio.__version__) < version.parse(minimum_gradio_version):
         print_error_explanation(f"""
 You are running gradio {gradio.__version__}.
-The program is designed to work with gradio {expected_gradio_version}.
+The program is designed to work with gradio {minimum_gradio_version} or newer 5.x builds.
 Using a different version of gradio is extremely likely to break the program.
 
 Reasons why you have the mismatched gradio version can be:

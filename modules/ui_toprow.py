@@ -1,6 +1,7 @@
 import gradio as gr
 
 from modules import shared, ui_prompt_styles
+from modules.gradio_compat import with_webui_tooltip
 import modules.images
 
 from modules.ui_components import ToolButton
@@ -97,10 +98,22 @@ class Toprow:
         with gr.Row(elem_id=f"{self.id_part}_generate_box", elem_classes=["generate-box"] + (["generate-box-compact"] if self.is_compact else []), render=not self.is_compact) as submit_box:
             self.submit_box = submit_box
 
-            self.interrupt = gr.Button('Interrupt', elem_id=f"{self.id_part}_interrupt", elem_classes="generate-box-interrupt", tooltip="End generation immediately or after completing current batch")
-            self.skip = gr.Button('Skip', elem_id=f"{self.id_part}_skip", elem_classes="generate-box-skip", tooltip="Stop generation of current batch and continues onto next batch")
-            self.interrupting = gr.Button('Interrupting...', elem_id=f"{self.id_part}_interrupting", elem_classes="generate-box-interrupting", tooltip="Interrupting generation...")
-            self.submit = gr.Button('Generate', elem_id=f"{self.id_part}_generate", variant='primary', tooltip="Right click generate forever menu")
+            self.interrupt = with_webui_tooltip(
+                gr.Button('Interrupt', elem_id=f"{self.id_part}_interrupt", elem_classes="generate-box-interrupt"),
+                "End generation immediately or after completing current batch",
+            )
+            self.skip = with_webui_tooltip(
+                gr.Button('Skip', elem_id=f"{self.id_part}_skip", elem_classes="generate-box-skip"),
+                "Stop generation of current batch and continues onto next batch",
+            )
+            self.interrupting = with_webui_tooltip(
+                gr.Button('Interrupting...', elem_id=f"{self.id_part}_interrupting", elem_classes="generate-box-interrupting"),
+                "Interrupting generation...",
+            )
+            self.submit = with_webui_tooltip(
+                gr.Button('Generate', elem_id=f"{self.id_part}_generate", variant='primary'),
+                "Right click generate forever menu",
+            )
 
             def interrupt_function():
                 if not shared.state.stopping_generation and shared.state.job_count > 1 and shared.opts.interrupt_after_current:

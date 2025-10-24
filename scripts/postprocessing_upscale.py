@@ -4,6 +4,7 @@ from PIL import Image
 import numpy as np
 
 from modules import scripts_postprocessing, shared
+from modules.gradio_compat import with_webui_tooltip
 import gradio as gr
 
 from modules.ui_components import FormRow, ToolButton, InputAccordion
@@ -45,7 +46,17 @@ class ScriptPostprocessingUpscale(scripts_postprocessing.ScriptPostprocessing):
                             with gr.Column(scale=4):
                                 upscaling_resize = gr.Slider(minimum=1.0, maximum=8.0, step=0.05, label="Resize", value=4, elem_id="extras_upscaling_resize")
                             with gr.Column(scale=1, min_width=160):
-                                max_side_length = gr.Number(label="Max side length", value=0, elem_id="extras_upscale_max_side_length", tooltip="If any of two sides of the image ends up larger than specified, will downscale it to fit. 0 = no limit.", min_width=160, step=8, minimum=0)
+                                max_side_length = with_webui_tooltip(
+                                    gr.Number(
+                                        label="Max side length",
+                                        value=0,
+                                        elem_id="extras_upscale_max_side_length",
+                                        min_width=160,
+                                        step=8,
+                                        minimum=0,
+                                    ),
+                                    "If any of two sides of the image ends up larger than specified, will downscale it to fit. 0 = no limit.",
+                                )
 
                     with gr.TabItem('Scale to', elem_id="extras_scale_to_tab") as tab_scale_to:
                         with FormRow():
