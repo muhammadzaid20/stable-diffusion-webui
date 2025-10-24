@@ -27,10 +27,20 @@ def fix_torch_version():
 def fix_pytorch_lightning():
     # Checks if pytorch_lightning.utilities.distributed already exists in the sys.modules cache
     if 'pytorch_lightning.utilities.distributed' not in sys.modules:
-        import pytorch_lightning
-        # Lets the user know that the library was not found and then will set it to pytorch_lightning.utilities.rank_zero
-        print("Pytorch_lightning.distributed not found, attempting pytorch_lightning.rank_zero")
-        sys.modules["pytorch_lightning.utilities.distributed"] = pytorch_lightning.utilities.rank_zero
+        try:
+            import pytorch_lightning as pl_module
+        except ModuleNotFoundError:
+            try:
+                import lightning.pytorch as pl_module  # type: ignore
+            except ModuleNotFoundError:
+                return
+        utilities = getattr(pl_module, 'utilities', None)
+        rank_zero = getattr(utilities, 'rank_zero', None) if utilities else None
+        if rank_zero is None:
+            return
+        print('pytorch_lightning.utilities.distributed not found, aliasing rank_zero utilities for compatibility')
+        sys.modules['pytorch_lightning.utilities.distributed'] = rank_zero
+        sys.modules.setdefault('lightning.pytorch.utilities.distributed', rank_zero)
 
 def fix_asyncio_event_loop_policy():
     """

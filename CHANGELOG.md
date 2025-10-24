@@ -1,3 +1,16 @@
+## 1.11.0
+
+### Highlights:
+* Official Python 3.11/3.12 support across Windows, Linux, and WSL installers.
+* Dependency refresh: FastAPI 0.120, Gradio 4.44, Transformers 4.52, Safetensors 0.6, Pillow 10.3, and more.
+* Updated documentation for 2025 hardware/software baselines including PyTorch 2.3 and CUDA 12.1.
+
+### Maintenance:
+* Added Lightning 2.x compatibility shims for legacy training code paths.
+* Refreshed `requirements_versions.txt`, `requirements.txt`, and testing dependencies to align with 2025 package releases.
+* Bumped the WSL environment YAML to Python 3.11 and CUDA 12.1.
+
+
 ## 1.10.1
 
 ### Bug Fixes:

@@ -51,12 +51,18 @@ class RestrictedUnpickler(pickle.Unpickler):
             return getattr(numpy, name)
         if module == '_codecs' and name == 'encode':
             return encode
-        if module == "pytorch_lightning.callbacks" and name == 'model_checkpoint':
-            import pytorch_lightning.callbacks
-            return pytorch_lightning.callbacks.model_checkpoint
-        if module == "pytorch_lightning.callbacks.model_checkpoint" and name == 'ModelCheckpoint':
-            import pytorch_lightning.callbacks.model_checkpoint
-            return pytorch_lightning.callbacks.model_checkpoint.ModelCheckpoint
+        if module in ("pytorch_lightning.callbacks", "lightning.pytorch.callbacks") and name == 'model_checkpoint':
+            try:
+                import pytorch_lightning.callbacks as callbacks
+            except ModuleNotFoundError:
+                import lightning.pytorch.callbacks as callbacks  # type: ignore
+            return callbacks.model_checkpoint
+        if module in ("pytorch_lightning.callbacks.model_checkpoint", "lightning.pytorch.callbacks.model_checkpoint") and name == 'ModelCheckpoint':
+            try:
+                import pytorch_lightning.callbacks.model_checkpoint as checkpoint_module
+            except ModuleNotFoundError:
+                import lightning.pytorch.callbacks.model_checkpoint as checkpoint_module  # type: ignore
+            return checkpoint_module.ModelCheckpoint
         if module == "__builtin__" and name == 'set':
             return set
 

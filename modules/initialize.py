@@ -14,9 +14,13 @@ def imports():
 
     import torch  # noqa: F401
     startup_timer.record("import torch")
-    import pytorch_lightning  # noqa: F401
-    startup_timer.record("import torch")
+    try:
+        import pytorch_lightning  # noqa: F401
+    except ModuleNotFoundError:
+        import lightning.pytorch as pytorch_lightning  # type: ignore # noqa: F401
+    startup_timer.record("import pytorch_lightning")
     warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="pytorch_lightning")
+    warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="lightning.pytorch")
     warnings.filterwarnings(action="ignore", category=UserWarning, module="torchvision")
 
     os.environ.setdefault('GRADIO_ANALYTICS_ENABLED', 'False')
