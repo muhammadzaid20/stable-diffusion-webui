@@ -3,7 +3,6 @@
 # As the LDSR upscaler relies on VQModel & VQModelInterface, the hijack aims to put them back into the ldm.models.autoencoder
 import numpy as np
 import torch
-import pytorch_lightning as pl
 import torch.nn.functional as F
 from contextlib import contextmanager
 
@@ -16,6 +15,9 @@ from ldm.util import instantiate_from_config
 
 import ldm.models.autoencoder
 from packaging import version
+from modules.lightning_compat import get_lightning_module
+
+pl = get_lightning_module()
 
 class VQModel(pl.LightningModule):
     def __init__(self,
