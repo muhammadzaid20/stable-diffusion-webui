@@ -4,7 +4,7 @@ A web interface for Stable Diffusion, implemented using Gradio library.
 ![](screenshot.png)
 
 ## What's new in 2025
-- Updated dependency baseline for Python 3.12, PyTorch 2.4.1, CUDA 12.1, FastAPI 0.120, Gradio 4.44+, and Transformers 4.57.
+- Updated dependency baseline for Python 3.12, PyTorch 2.7.0, CUDA 12.6, FastAPI 0.120, Gradio 5.49+, and Transformers 4.57.
 - Refreshed installation instructions for current Windows, Linux, and WSL distributions.
 - Stable Diffusion 3, SDXL, and Flux workflows continue to work with the latest community checkpoints and extensions.
 
@@ -108,11 +108,13 @@ Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-di
 ### Future NVIDIA GPUs and new CUDA architectures
 
 New NVIDIA cards occasionally launch before prebuilt PyTorch wheels expose kernels
-for their compute capability. When we detect that situation the launcher now
-automatically switches to CPU execution and prints guidance on installing a torch
-build that supports the reported architecture. Follow the link in the warning to
-install an appropriate preview or future wheel, then remove the fallback by
-launching with the updated torch package installed.
+for their compute capability. The default installation now targets PyTorch 2.7.0+
+with CUDA 12.6 wheels so RTX 50-series GPUs work out of the box. If you override
+the torch version and we detect that your GPU is newer than the compiled kernels,
+the launcher will switch to CPU execution and print guidance on installing a
+torch build that supports the reported architecture. Follow the link in the
+warning to install an appropriate preview or future wheel, then relaunch with the
+updated torch package installed.
 
 Alternatively, use online services (like Google Colab):
 

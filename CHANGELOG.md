@@ -3,7 +3,7 @@
 ### Highlights:
 * Official Python 3.12 support across Windows, Linux, and WSL installers (Python 3.11.9+ remains supported).
 * Dependency refresh: FastAPI 0.120, Gradio 5.49, Transformers 4.57, Safetensors 0.6.2, Pillow 11.1, Lightning 2.5, and more.
-* Updated documentation for 2025 hardware/software baselines including PyTorch 2.4.1 and CUDA 12.1.
+* Updated documentation for 2025 hardware/software baselines including PyTorch 2.7.0 and CUDA 12.6.
 
 ### Maintenance:
 * Centralized Lightning 2.x compatibility helpers so legacy training code paths work with either package namespace.
@@ -11,7 +11,8 @@
 * Raised the `blendmodes` pin to its 2025 release to stay compatible with the modern Pillow 11 baseline.
 * Upgraded to Gradio 5.49.1 so Pillow 11 stays compatible with the WebUI frontend stack.
 * Added a compatibility shim and explicit dependency on `packaging` so legacy CLIP imports keep working with modern Setuptools releases.
-* Bumped the WSL environment YAML to Python 3.12 and CUDA 12.1.
+* Bumped the WSL environment YAML to Python 3.12 and CUDA 12.6.
+* Raised the Torch baseline to 2.7.0 so upcoming RTX 50-series GPUs are supported out of the box.
 * Detect GPUs that are newer than the bundled CUDA kernels and fall back to CPU mode with guidance on installing a supporting Torch build.
 
 
