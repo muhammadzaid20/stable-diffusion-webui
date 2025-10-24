@@ -2,6 +2,7 @@ setuptools==70.2.0  # updated baseline for 2025 dependency stack
 GitPython==3.1.44
 Pillow==11.1.0
 accelerate==1.11.0
+blendmodes==2025
 blendmodes==2022
 clean-fid==0.1.35
 diskcache==5.6.3
