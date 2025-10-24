@@ -17,6 +17,9 @@
 * Detect GPUs that are newer than the bundled CUDA kernels and fall back to CPU mode with guidance on installing a supporting Torch build.
 * Reworked Gradio tooltip handling so the WebUI metadata survives the 5.x constructor API changes without breaking older extensions.
 * Updated TF32 enablement to the new PyTorch 2.9 backend knobs and normalized Multi-Head Attention masks to satisfy the stricter kernels.
+* Translated legacy `_js` event hooks to Gradio's modern listener API so existing UI bindings continue to work on 5.49.
+* Hardened CLIP lazy loading to avoid conflicting `state_dict` arguments on Transformers 4.57 and prevent bogus `None` repository lookups.
+* Expanded LoRA multi-head attention masks to the broadcastable batch/head layout required by PyTorch 2.9.
 
 
 ## 1.10.1

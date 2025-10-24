@@ -85,6 +85,11 @@ def _wrap_event_listener_setup(original):
 
             return event_trigger(*trigger_args, **trigger_kwargs)
 
+        # Gradio attaches runtime metadata (event name, callbacks, etc.) to the
+        # returned trigger. Propagate that state to our wrapper so downstream
+        # consumers continue to behave as expected.
+        trigger_with_legacy_js.__dict__.update(event_trigger.__dict__)
+
         return trigger_with_legacy_js
 
     return setup_with_legacy_js
