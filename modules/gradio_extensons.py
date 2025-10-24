@@ -1,6 +1,32 @@
+import importlib
+
 import gradio as gr
 
 from modules import scripts, ui_tempdir, patches
+
+
+def _resolve_io_component_class():
+    """Return the base component class to patch across Gradio versions."""
+
+    io_component = getattr(getattr(gr, "components", None), "IOComponent", None)
+    if io_component is not None:
+        return io_component
+
+    # Gradio 5 reorganised components under the unified Component base class.
+    components_module = getattr(gr, "components", None)
+    if components_module is not None:
+        candidate = getattr(components_module, "Component", None)
+        if candidate is not None:
+            return candidate
+
+    base_spec = importlib.util.find_spec("gradio.components.base")
+    if base_spec is not None:
+        components_base = importlib.import_module("gradio.components.base")
+        candidate = getattr(components_base, "Component", None)
+        if candidate is not None:
+            return candidate
+
+    raise AttributeError("Could not locate a Gradio component base class to patch")
 
 
 def add_classes_to_gradio_component(comp):
@@ -74,7 +100,9 @@ def Blocks_get_config_file(self, *args, **kwargs):
     return config
 
 
-original_IOComponent_init = patches.patch(__name__, obj=gr.components.IOComponent, field="__init__", replacement=IOComponent_init)
+IOComponentBase = _resolve_io_component_class()
+
+original_IOComponent_init = patches.patch(__name__, obj=IOComponentBase, field="__init__", replacement=IOComponent_init)
 original_Block_get_config = patches.patch(__name__, obj=gr.blocks.Block, field="get_config", replacement=Block_get_config)
 original_BlockContext_init = patches.patch(__name__, obj=gr.blocks.BlockContext, field="__init__", replacement=BlockContext_init)
 original_Blocks_get_config_file = patches.patch(__name__, obj=gr.blocks.Blocks, field="get_config_file", replacement=Blocks_get_config_file)
