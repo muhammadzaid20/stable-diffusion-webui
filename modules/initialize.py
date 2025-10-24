@@ -6,6 +6,7 @@ import warnings
 from threading import Thread
 
 from modules.timer import startup_timer
+from modules.lightning_compat import get_lightning_module, ensure_rank_zero_aliases
 
 
 def imports():
@@ -14,9 +15,11 @@ def imports():
 
     import torch  # noqa: F401
     startup_timer.record("import torch")
-    import pytorch_lightning  # noqa: F401
-    startup_timer.record("import torch")
+    get_lightning_module()
+    ensure_rank_zero_aliases()
+    startup_timer.record("import pytorch_lightning")
     warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="pytorch_lightning")
+    warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="lightning.pytorch")
     warnings.filterwarnings(action="ignore", category=UserWarning, module="torchvision")
 
     os.environ.setdefault('GRADIO_ANALYTICS_ENABLED', 'False')
