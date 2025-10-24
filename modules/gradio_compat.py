@@ -43,10 +43,16 @@ def resolve_deprecation_warning():
 
     for module_suffix, attr in _DEPRECATION_MODULES:
         module_name = f"gradio.{module_suffix}"
-        if importlib.util.find_spec(module_name) is None:
+        try:
+            module = importlib.import_module(module_name)
+        except ModuleNotFoundError:
+            continue
+        except AttributeError:
+            # Some namespace packages in Gradio 5.x do not expose __path__ and
+            # raise AttributeError during import discovery. Treat these as
+            # missing modules and continue searching fallbacks.
             continue
 
-        module = importlib.import_module(module_name)
         warning_cls = getattr(module, attr, None)
         if warning_cls is not None:
             return warning_cls
