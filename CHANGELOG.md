@@ -10,6 +10,7 @@
 * Refreshed `requirements_versions.txt`, `requirements.txt`, and testing dependencies to align with the 2025 package stack.
 * Raised the `blendmodes` pin to its 2025 release to stay compatible with the modern Pillow 11 baseline.
 * Upgraded to Gradio 5.49.1 so Pillow 11 stays compatible with the WebUI frontend stack.
+* Added a compatibility shim and explicit dependency on `packaging` so legacy CLIP imports keep working with modern Setuptools releases.
 * Bumped the WSL environment YAML to Python 3.12 and CUDA 12.1.
 
 

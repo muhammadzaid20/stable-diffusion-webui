@@ -17,6 +17,8 @@ def imports():
     startup_timer.record("import torch")
     get_lightning_module()
     ensure_rank_zero_aliases()
+    from modules.pkg_resources_compat import ensure_packaging_attribute
+    ensure_packaging_attribute()
     startup_timer.record("import pytorch_lightning")
     warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="pytorch_lightning")
     warnings.filterwarnings(action="ignore", category=DeprecationWarning, module="lightning.pytorch")
